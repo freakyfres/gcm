@@ -23,3 +23,6 @@ dist-ssr
 *.sln
 *.sw?
 .direnv
+dist-electron
+native/.cache/clangd/index
+native/build
