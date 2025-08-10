@@ -25,12 +25,19 @@
       {
         devShells.default = pkgs.mkShell {
           packages = with pkgs; [
-            hello
+            gcc15
+            cmake
+            pnpm
+            pkg-config
+            xorg.libXfixes
+            xorg.libX11
+            xorg.libXau
+            xorg.libXdmcp
           ];
           LD_LIBRARY_PATH = pkgs.lib.strings.makeLibraryPath (
             with pkgs;
             [
-
+              libgbm
             ]
           );
           shellHook = ''

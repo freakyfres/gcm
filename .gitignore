@@ -26,3 +26,4 @@ dist-ssr
 dist-electron
 native/.cache/clangd/index
 native/build
+.cache/clangd/index

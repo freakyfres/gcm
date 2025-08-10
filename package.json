@@ -4,30 +4,38 @@
   "version": "0.0.0",
   "type": "module",
   "scripts": {
-    "dev": "vite",
-    "build": "tsc && vite build && electron-builder",
-    "lint": "eslint . --ext ts,tsx --report-unused-disable-directives --max-warnings 0",
-    "preview": "vite preview"
+    "dev": "pnpm build-native && electron-vite dev",
+    "start": "electron-vite preview",
+    "prebuild": "electron-vite build",
+    "configure": "cmake-js configure -d native -D",
+    "build-native": "pnpm configure && cmake-js compile -d native -D && node ./scripts/copyNativeBuild.mjs"
   },
   "dependencies": {
     "react": "^18.2.0",
-    "react-dom": "^18.2.0"
+    "react-dom": "^18.2.0",
+    "tailwindcss": "^4.1.11"
   },
   "devDependencies": {
+    "@tailwindcss/vite": "^4.1.11",
     "@types/react": "^18.2.64",
     "@types/react-dom": "^18.2.21",
-    "@typescript-eslint/eslint-plugin": "^7.1.1",
-    "@typescript-eslint/parser": "^7.1.1",
     "@vitejs/plugin-react": "^4.2.1",
-    "eslint": "^8.57.0",
-    "eslint-plugin-react-hooks": "^4.6.0",
-    "eslint-plugin-react-refresh": "^0.4.5",
-    "typescript": "^5.2.2",
-    "vite": "^5.1.6",
-    "electron": "^30.0.1",
+    "cmake-js": "^7.3.1",
+    "electron": "^37.0.0",
     "electron-builder": "^24.13.3",
+    "electron-vite": "^4.0.0",
+    "eslint": "^9.32.0",
+    "eslint-plugin-react-hooks": "^5.2.0",
+    "eslint-plugin-react-refresh": "^0.4.19",
+    "eslint-plugin-simple-import-sort": "^12.1.1",
+    "eslint-plugin-unused-imports": "^4.1.4",
+    "node-addon-api": "^8.5.0",
+    "typescript": "^5.2.2",
+    "typescript-eslint": "^8.39.0",
+    "vite": "^5.1.6",
     "vite-plugin-electron": "^0.28.6",
-    "vite-plugin-electron-renderer": "^0.14.5"
+    "vite-plugin-electron-renderer": "^0.14.5",
+    "vite-tsconfig-paths": "^5.1.4"
   },
-  "main": "dist-electron/main.js"
+  "main": "dist/main/main.js"
 }
