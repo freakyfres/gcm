@@ -7,6 +7,7 @@ import { windowState } from "./WindowState";
 import "./ipc";
 import { app, BrowserWindow } from "electron";
 import { join } from "node:path";
+import { inspect } from "node:util";
 
 process.env.APP_ROOT = join(__dirname, "..");
 console.log(native);
@@ -19,12 +20,12 @@ process.env.VITE_PUBLIC = ELECTRON_RENDERER_URL ? join(process.env.APP_ROOT, "pu
 
 console.log("foobar");
 // eslint-disable-next-line @typescript-eslint/require-await
-native.registerClipboardWatcherCallback(async () => {
+native.registerClipboardWatcherCallback(async (data) => {
+    console.log(inspect(data, { depth: 5 }));
     console.log("Clipboard changed!");
 });
 
 let win: BrowserWindow;
-
 
 
 function createWindow() {
