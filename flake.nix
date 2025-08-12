@@ -49,6 +49,7 @@
               glib
               nspr
               nss
+              dbus
             ]
           );
           shellHook = ''
