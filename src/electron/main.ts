@@ -1,13 +1,14 @@
 import { writeProcessId } from "./dev";
 await writeProcessId();
 import { createSystemTray } from "./tray/systemTray";
-import native from "./gcmNative.node";
+import native, { ClipboardData, IconData } from "./gcmNative.node";
 import { windowState } from "./WindowState";
 
 import "./ipc";
+import { createCanvas, ImageData } from "canvas";
 import { app, BrowserWindow } from "electron";
+import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
-import { inspect } from "node:util";
 
 process.env.APP_ROOT = join(__dirname, "..");
 console.log(native);
@@ -18,10 +19,22 @@ export const MAIN_DIST = join(process.env.APP_ROOT, "dist-electron");
 export const RENDERER_DIST = join(process.env.APP_ROOT, "dist");
 process.env.VITE_PUBLIC = ELECTRON_RENDERER_URL ? join(process.env.APP_ROOT, "public") : RENDERER_DIST;
 
-console.log("foobar");
+function iconDataToPng(image: IconData): Buffer {
+    const imageData = new ImageData(new Uint8ClampedArray(image.data), image.width, image.height);
+    const canvas = createCanvas(image.width, image.height);
+    const ctx = canvas.getContext("2d");
+
+    ctx.putImageData(imageData, 0, 0);
+
+    return canvas.toBuffer("image/png");
+}
 // eslint-disable-next-line @typescript-eslint/require-await
-native.registerClipboardWatcherCallback(async (data) => {
-    console.log(inspect(data, { depth: 5 }));
+native.registerClipboardWatcherCallback(async (data: ClipboardData) => {
+    if (data.appInfo) {
+        const buf = iconDataToPng(data.appInfo.iconData);
+
+        writeFile("image.png", buf);
+    }
     console.log("Clipboard changed!");
 });
 
@@ -30,7 +43,7 @@ let win: BrowserWindow;
 
 function createWindow() {
     win = new BrowserWindow({
-        icon: join(process.env.VITE_PUBLIC, "electron-vite.svg"),
+        icon: join(process.env.VITE_PUBLIC!, "electron-vite.svg"),
         webPreferences: {
             preload: join(__dirname, "preload.mjs"),
         },

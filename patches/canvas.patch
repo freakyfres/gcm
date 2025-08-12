@@ -1,0 +1,16 @@
+diff --git a/lib/bindings.js b/lib/bindings.js
+index 40cef3c69f3f095bbc1eaf06de45b0f78399e1f1..d7ffa0e7ea16c5123c078ba29d97c06c8efb87c1 100644
+--- a/lib/bindings.js
++++ b/lib/bindings.js
+@@ -1,6 +1,10 @@
+ 'use strict'
+ 
+-const bindings = require('../build/Release/canvas.node')
++let bindings = require('../build/Release/canvas.node')
++
++if (Object.hasOwn(bindings, "__esModule") && bindings.__esModule) {
++  bindings = bindings.default
++}
+ 
+ module.exports = bindings
+ 

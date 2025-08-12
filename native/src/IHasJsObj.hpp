@@ -1,6 +1,7 @@
 #pragma once
 
 #include "napi.h"
+#include "util.hpp"
 
 namespace gcm {
 	template<typename T>
@@ -16,9 +17,14 @@ namespace gcm {
 	Napi::Value toJsObject<bool>(Napi::Env env, const bool& value);
 
 	template<>
-	Napi::Value
-	toJsObject<std::vector<uint8_t>>(Napi::Env env,
-									 const std::vector<uint8_t>& value);
+	Napi::Value toJsObject<std::vector<u8>>(Napi::Env env,
+											const std::vector<u8>& value);
+
+	template<>
+	Napi::Value toJsObject<std::vector<u32>>(Napi::Env env,
+											 const std::vector<u32>& value);
+	template<>
+	Napi::Value toJsObject<u32>(Napi::Env env, const u32& value);
 	template<>
 	Napi::Value
 	toJsObject<std::vector<std::string>>(Napi::Env env,

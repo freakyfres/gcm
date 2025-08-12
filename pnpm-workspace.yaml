@@ -1,2 +1,6 @@
 onlyBuiltDependencies:
+  - canvas
   - esbuild
+
+patchedDependencies:
+  canvas: patches/canvas.patch

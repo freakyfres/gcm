@@ -1,5 +1,7 @@
 #include "clipboard.hpp"
 
+#include "util.hpp"
+
 #include <chrono>
 #include <cstddef>
 #include <cstdint>
@@ -28,9 +30,9 @@ namespace gcm {
 
 		Atom actualType;
 		int actualFormat;
-		ulong nitems;
-		ulong bytesAfter;
-		u_char* propRet = nullptr;
+		u64 nitems;
+		u64 bytesAfter;
+		u8* propRet = nullptr;
 		if (XGetWindowProperty(display.get(),
 							   window,
 							   atoms._NET_WM_NAME,
@@ -60,16 +62,47 @@ namespace gcm {
 		return ret;
 	};
 
-	std::vector<uint8_t> WindowContext::getWindowIcon() const {
-		return {};
+	IconData WindowContext::getWindowIcon() const {
+		Atom actualType;
+		i32 actualFormat;
+		u64 nitems;
+		u64 bytesAfter;
+		u8* propRet;
+		IconData ret;
+
+		if (XGetWindowProperty(display.get(),
+							   window,
+							   atoms._NET_WM_ICON,
+							   0,
+							   -1,
+							   False,
+							   XA_CARDINAL,
+							   &actualType,
+							   &actualFormat,
+							   &nitems,
+							   &bytesAfter,
+							   &propRet)
+			== Success) {
+
+			if (propRet && nitems > 0) {
+				auto data = (u64*)propRet;
+				ret.width = *data++;
+				ret.height = *data++;
+				ret.data.resize(ret.width * ret.height);
+				for (auto i = 0uz; i < ret.data.size(); i++) {
+					ret.data[i] = *data++;
+				}
+			}
+		}
+		return ret;
 	};
 
 	std::vector<std::string> WindowContext::getWindowClass() const {
 		Atom actualType;
-		int actualFormat;
-		ulong nitems;
-		ulong bytesAfter;
-		u_char* propRet = nullptr;
+		i32 actualFormat;
+		u64 nitems;
+		u64 bytesAfter;
+		u8* propRet = nullptr;
 		std::vector<std::string> ret;
 
 		if (XGetWindowProperty(display.get(),
@@ -99,10 +132,10 @@ namespace gcm {
 		std::optional<pid_t> ret {std::nullopt};
 
 		Atom actualType;
-		int actualFormat;
-		ulong nitems;
-		ulong bytesAfter;
-		u_char* propRet = nullptr;
+		i32 actualFormat;
+		u64 nitems;
+		u64 bytesAfter;
+		u8* propRet = nullptr;
 
 		if (XGetWindowProperty(display.get(),
 							   window,
@@ -155,9 +188,9 @@ namespace gcm {
 		Atoms atoms {display};
 		Window ret = 0;
 		Atom actualType;
-		int actualFormat;
-		ulong nitems;
-		ulong bytesAfter;
+		i32 actualFormat;
+		u64 nitems;
+		u64 bytesAfter;
 		Window* propRet = nullptr;
 
 		if (XGetWindowProperty(display.get(),
@@ -171,7 +204,7 @@ namespace gcm {
 							   &actualFormat,
 							   &nitems,
 							   &bytesAfter,
-							   (u_char**)&propRet)
+							   (u8**)&propRet)
 			== Success) {
 			if (propRet && nitems > 0) {
 				ret = *propRet;
@@ -182,10 +215,28 @@ namespace gcm {
 		return std::unexpected("XGetWindowProperty failed");
 	}
 
+	Napi::Value IconData::toJsObject(Napi::Env env) const {
+		auto obj = Napi::Object::New(env);
+		obj["width"] = gcm::toJsObject(env, (u32)width);
+		obj["height"] = gcm::toJsObject(env, (u32)height);
+		Napi::TypedArrayOf<unsigned char> arr =
+			Napi::Uint8Array::New(env, data.size() * sizeof(u32));
+		for (auto i = 0uz; i < data.size(); i++) {
+			u32 elem = data[i];
+			arr[i * 4 + 0] = (elem & 0x00FF0000) >> 16; // R
+			arr[i * 4 + 1] = (elem & 0x0000FF00) >> 8; // G
+			arr[i * 4 + 2] = (elem & 0x000000FF) >> 0; // B
+			arr[i * 4 + 3] = (elem & 0xFF000000) >> 24; // A
+		}
+		obj["data"] = arr;
+		return obj;
+	}
+
 	void WindowInfo::debug() const {
 		std::println("WindowInfo {{");
 		std::println("  pid: {}", pid ? std::to_string(*pid) : "No Pid");
-		std::println("  hasIconData: {}", iconData.empty() ? "false" : "true");
+		std::println("  hasIconData: {}",
+					 iconData.height && iconData.width ? "false" : "true");
 		std::println("  windowClass: [");
 		for (const auto& cls : windowClass) {
 			std::println("    `{}`", cls);
@@ -200,8 +251,7 @@ namespace gcm {
 	Napi::Value WindowInfo::toJsObject(Napi::Env env) const {
 		auto obj = Napi::Object::New(env);
 		obj["pid"] = pid ? Napi::Number::New(env, *pid) : env.Null();
-		obj["iconData"] =
-			gcm::toJsObject(env, std::vector<uint8_t> {1, 2, 3, 4});
+		obj["iconData"] = iconData.toJsObject(env);
 		obj["windowClass"] = gcm::toJsObject(env, windowClass);
 		obj["windowTitle"] = gcm::toJsObject(env, windowTitle);
 		obj["exePath"] = exePath ? gcm::toJsObject(env, *exePath) : env.Null();

@@ -38,6 +38,8 @@
             with pkgs;
             [
               libgbm
+              librsvg
+              giflib
             ]
           );
           shellHook = ''

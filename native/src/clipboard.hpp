@@ -1,11 +1,12 @@
 #pragma once
 #include "Atoms.hpp"
 #include "IHasJsObj.hpp"
-#include "napi.h"
+#include "util.hpp"
 
 #include <cstdint>
 #include <expected>
 #include <memory>
+#include <napi.h>
 #include <optional>
 #include <string>
 #include <vector>
@@ -15,6 +16,7 @@
 
 namespace gcm {
 	struct WindowInfo;
+	struct IconData;
 
 	class WindowContext {
 	  public:
@@ -22,7 +24,7 @@ namespace gcm {
 		~WindowContext() noexcept = default;
 		WindowInfo getWindowInfo() const;
 		std::string getWindowName() const;
-		std::vector<uint8_t> getWindowIcon() const;
+		IconData getWindowIcon() const;
 		std::vector<std::string> getWindowClass() const;
 		std::optional<pid_t> getWindowPid() const;
 		std::optional<std::string> getWindowExePath(pid_t pid) const;
@@ -35,9 +37,18 @@ namespace gcm {
 		Atoms atoms {display};
 	};
 
+	struct IconData: public IHasJsObj {
+		u32 width {};
+		u32 height {};
+		std::vector<u32> data {};
+
+		virtual Napi::Value toJsObject(Napi::Env env) const override;
+	};
+
 	struct WindowInfo: public IHasJsObj {
+
 		std::optional<pid_t> pid;
-		std::vector<uint8_t> iconData;
+		IconData iconData;
 		std::vector<std::string> windowClass;
 		std::string windowTitle;
 		std::optional<std::string> exePath;
@@ -69,7 +80,7 @@ namespace gcm {
 		struct ClipboardState: public IHasJsObj {
 			ChangeReason changeReason;
 			std::optional<WindowInfo> appInfo;
-			uint32_t changeTimestamp;
+			u32 changeTimestamp;
 			virtual Napi::Value toJsObject(Napi::Env env) const override;
 		};
 
@@ -93,7 +104,8 @@ namespace gcm {
 			 * @return false the latest clipboard state was successfully
 			 * retrieved and written to state
 			 */
-			void getLatestClipboardState(std::unique_ptr<ClipboardState>& state) const;
+			void getLatestClipboardState(
+				std::unique_ptr<ClipboardState>& state) const;
 
 		  private:
 			Atoms atoms;

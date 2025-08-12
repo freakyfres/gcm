@@ -39,7 +39,7 @@ export default defineConfig({
     main: {
         build: {
             outDir: "dist/main",
-            sourcemap: "inline",
+            sourcemap: true,
             lib: {
                 entry: "src/electron/main.ts",
             },

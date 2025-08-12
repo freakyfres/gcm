@@ -1,9 +1,15 @@
-interface AppInfo {
+export interface IconData {
+    width: number;
+    height: number;
+    data: Uint8Array;
+}
+
+export interface AppInfo {
     pid: number | null;
     /**
-     * 0 if not available
+     * empty if not available
      */
-    iconData: Uint8Array;
+    iconData: IconData;
     /**
      * empty if class not found
      */
@@ -12,7 +18,7 @@ interface AppInfo {
     exePath: string | null;
 }
 
-interface ClipboardData {
+export interface ClipboardData {
     changeReason: "new_owner" | "destroy" | "close";
     changeTimestamp: number;
     appInfo: AppInfo | null;
