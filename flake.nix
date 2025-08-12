@@ -56,6 +56,7 @@
               gtk3
               pango
               expat
+              libxkbcommon
             ]
             ++ (with pkgs.xorg; [
               libX11
