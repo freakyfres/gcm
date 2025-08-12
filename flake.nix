@@ -64,6 +64,7 @@
               libXcomposite
               libXdamage
               libXext
+              libXrandr
             ])
           );
           shellHook = ''
