@@ -47,6 +47,7 @@
               giflib
               #electron/chromium
               glib
+              nspr
             ]
           );
           shellHook = ''
