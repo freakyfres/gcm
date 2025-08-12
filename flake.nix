@@ -63,6 +63,7 @@
               libXdmcp
               libXcomposite
               libXdamage
+              libXext
             ])
           );
           shellHook = ''
