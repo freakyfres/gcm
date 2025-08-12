@@ -92,6 +92,7 @@ namespace gcm {
 				for (auto i = 0uz; i < ret.data.size(); i++) {
 					ret.data[i] = *data++;
 				}
+				XFree(propRet);
 			}
 		}
 		return ret;
