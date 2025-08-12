@@ -38,6 +38,8 @@
             fish
             zsh
             libGL
+            xorg.xprop
+            xorg.xwininfo
           ];
           LD_LIBRARY_PATH = pkgs.lib.strings.makeLibraryPath (
             with pkgs;

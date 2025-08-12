@@ -32,14 +32,17 @@ function iconDataToPng(image: IconData): Buffer {
 // eslint-disable-next-line @typescript-eslint/require-await
 native.registerClipboardWatcherCallback(async (data: ClipboardData) => {
     if (data.appInfo) {
-        const buf = iconDataToPng(data.appInfo.iconData);
+        try {
+            const buf = iconDataToPng(data.appInfo.iconData);
 
+            writeFile("image.png", buf);
+        } catch (e) {
+            console.warn("failed to write icon data", e);
+        }
         console.log(inspect(data, {
             colors: true,
             depth: null,
         }));
-
-        writeFile("image.png", buf);
     }
     console.log("Clipboard changed!");
 });
