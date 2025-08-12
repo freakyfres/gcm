@@ -55,6 +55,7 @@
               cairo
               gtk3
               pango
+              expat
             ]
             ++ (with pkgs.xorg; [
               libX11
