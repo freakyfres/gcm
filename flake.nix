@@ -53,6 +53,7 @@
               at-spi2-atk
               cups
               cairo
+              gtk3
             ]
           );
           shellHook = ''
