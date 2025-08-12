@@ -28,5 +28,3 @@ native/.cache/clangd/index
 native/build
 .cache/clangd/index
 a.out
-
-/src/generated/prisma
