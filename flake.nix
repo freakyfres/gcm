@@ -35,6 +35,7 @@
             xorg.libXdmcp
             nodejs_24
             corepack_latest
+            fish
           ];
           LD_LIBRARY_PATH = pkgs.lib.strings.makeLibraryPath (
             with pkgs;

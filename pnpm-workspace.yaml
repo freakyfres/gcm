@@ -1,5 +1,7 @@
 onlyBuiltDependencies:
+  - '@tailwindcss/oxide'
   - canvas
+  - electron
   - esbuild
 
 patchedDependencies:
