@@ -1,0 +1,20 @@
+diff --git a/esm/index.mjs b/esm/index.mjs
+index 87c11c68699d8cbea29ddb24d240b162932f64bd..43135d14656a9caa5c592c970e5c1202830742ac 100644
+--- a/esm/index.mjs
++++ b/esm/index.mjs
+@@ -1,5 +1,5 @@
+ import { createRequire } from 'module';
+-var require = createRequire('/');
++var fflate_require = createRequire('/');
+ // DEFLATE is a complex format; to read this code, you should probably check the RFC first:
+ // https://tools.ietf.org/html/rfc1951
+ // You may also wish to take a look at the guide I made about this program:
+@@ -13,7 +13,7 @@ var require = createRequire('/');
+ var Worker;
+ var workerAdd = ";var __w=require('worker_threads');__w.parentPort.on('message',function(m){onmessage({data:m})}),postMessage=function(m,t){__w.parentPort.postMessage(m,t)},close=process.exit;self=global";
+ try {
+-    Worker = require('worker_threads').Worker;
++    Worker = fflate_require('worker_threads').Worker;
+ }
+ catch (e) {
+ }

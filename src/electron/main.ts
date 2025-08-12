@@ -1,4 +1,4 @@
-import { writeProcessId } from "./dev";
+import { installReactDevtools, writeProcessId } from "./dev";
 await writeProcessId();
 import electronViteSvg from "./assets/electron-vite.svg?asset";
 import { createSystemTray } from "./tray/systemTray";
@@ -10,6 +10,7 @@ import { createCanvas, ImageData } from "canvas";
 import { app, BrowserWindow } from "electron";
 import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
+import { inspect } from "node:util";
 
 process.env.APP_ROOT = join(__dirname, "..");
 
@@ -33,6 +34,11 @@ native.registerClipboardWatcherCallback(async (data: ClipboardData) => {
     if (data.appInfo) {
         const buf = iconDataToPng(data.appInfo.iconData);
 
+        console.log(inspect(data, {
+            colors: true,
+            depth: null,
+        }));
+
         writeFile("image.png", buf);
     }
     console.log("Clipboard changed!");
@@ -44,7 +50,7 @@ function createWindow() {
     win = new BrowserWindow({
         icon: electronViteSvg,
         webPreferences: {
-            preload: join(__dirname, "preload.mjs"),
+            preload: join(__dirname, "..", "preload", "preload.cjs"),
         },
         alwaysOnTop: true,
         autoHideMenuBar: true,
@@ -82,4 +88,6 @@ process.on("uncaughtException", (error) => {
 
 app.whenReady()
     .then(createWindow)
-    .then(createSystemTray);
+    .then(createSystemTray)
+    .then(installReactDevtools);
+

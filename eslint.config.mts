@@ -556,7 +556,13 @@ const styleRules: Partial<_RuleOptions> = {
     "@stylistic/space-in-parens": ["error", "never"],
     "@stylistic/space-infix-ops": ["error"],
     "@stylistic/space-unary-ops": ["error"],
-    "@stylistic/spaced-comment": ["error", "always"],
+    "@stylistic/spaced-comment": [
+        "error",
+        "always",
+        {
+            markers: ["!"],
+        },
+    ],
     "@stylistic/switch-colon-spacing": ["error"],
     "@stylistic/template-curly-spacing": ["error", "never"],
     "@stylistic/template-tag-spacing": ["error"],

@@ -8,6 +8,9 @@ patchedDependencies:
   canvas:
     hash: f9da7ec9e1d82156a0a777b356f1ea87b9c83f8d8d9747431779beb262132016
     path: patches/canvas.patch
+  fflate:
+    hash: f1bc6d22e797f43a9dc9dbff95c376522be62d6a74f911fc904a0dd026d0b16f
+    path: patches/fflate.patch
 
 importers:
 
@@ -21,7 +24,7 @@ importers:
         version: 0.44.4
       fflate:
         specifier: ^0.8.2
-        version: 0.8.2
+        version: 0.8.2(patch_hash=f1bc6d22e797f43a9dc9dbff95c376522be62d6a74f911fc904a0dd026d0b16f)
       react:
         specifier: ^18.2.0
         version: 18.3.1
@@ -4456,7 +4459,7 @@ snapshots:
     dependencies:
       pend: 1.2.0
 
-  fflate@0.8.2: {}
+  fflate@0.8.2(patch_hash=f1bc6d22e797f43a9dc9dbff95c376522be62d6a74f911fc904a0dd026d0b16f): {}
 
   file-entry-cache@8.0.0:
     dependencies:

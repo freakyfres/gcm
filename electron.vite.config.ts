@@ -31,7 +31,7 @@ export default defineConfig({
             sourcemap: "inline",
             rollupOptions: {
                 output: {
-                    format: "es",
+                    format: "cjs",
                 },
             },
         },

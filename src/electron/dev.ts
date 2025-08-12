@@ -2,7 +2,7 @@ import { EXT_CACHE_DIR, REACT_DEVTOOLS_ID } from "./util/constants";
 import { crxToZip } from "./util/crx2Zip";
 import { exists, isDir } from "./util/fs";
 
-import { session } from "electron";
+import { LoadExtensionOptions, session } from "electron";
 import { unzip } from "fflate/node";
 import { mkdir, readFile, readlink, rm, writeFile } from "node:fs/promises";
 import { join } from "node:path";
@@ -21,6 +21,27 @@ export async function writeProcessId() {
 
     await writeFile(launchFile, updatedContent);
 }
+/**
+ * some code stolen from https://github.com/Vendicated/Vencord/blob/72329f901cae0e45feb24d9ff38eb2eb8d3756d0/src/main/utils/extensions.ts, thanks!
+ */
+
+/*!
+ * Vencord, a modification for Discord's desktop app
+ * Copyright (c) 2022 Vendicated and contributors
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 async function extract(data: Buffer, outDir: string) {
     await mkdir(outDir, { recursive: true });
     return new Promise<void>((resolve, reject) => {
@@ -61,7 +82,7 @@ async function extract(data: Buffer, outDir: string) {
     });
 }
 
-export async function installExtension(id: string) {
+export async function installExtension(id: string, opts?: LoadExtensionOptions) {
     if (await exists(EXT_CACHE_DIR)) {
         if (!await isDir(EXT_CACHE_DIR)) {
             throw new Error(`Extension cache dir ${EXT_CACHE_DIR} exists and is not a directory`);
@@ -82,7 +103,7 @@ export async function installExtension(id: string) {
 
         await extract(crxToZip(res), extPath);
     }
-    session.defaultSession.extensions.loadExtension(extPath);
+    session.defaultSession.extensions.loadExtension(extPath, opts);
 }
 
 export function installReactDevtools() {
