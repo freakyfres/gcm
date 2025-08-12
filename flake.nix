@@ -57,6 +57,7 @@
               pango
               expat
               libxkbcommon
+              alsa-lib
             ]
             ++ (with pkgs.xorg; [
               libX11
