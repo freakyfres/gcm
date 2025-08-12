@@ -50,6 +50,7 @@
               nspr
               nss
               dbus
+              at-spi2-atk
             ]
           );
           shellHook = ''
