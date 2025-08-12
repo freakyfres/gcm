@@ -62,6 +62,7 @@
               libXau
               libXdmcp
               libXcomposite
+              libXdamage
             ])
           );
           shellHook = ''
