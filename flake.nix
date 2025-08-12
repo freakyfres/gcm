@@ -36,13 +36,17 @@
             nodejs_24
             corepack_latest
             fish
+            zsh
           ];
           LD_LIBRARY_PATH = pkgs.lib.strings.makeLibraryPath (
             with pkgs;
             [
+              # node-canvas
               libgbm
               librsvg
               giflib
+              #electron/chromium
+              glib
             ]
           );
           shellHook = ''
