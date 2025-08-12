@@ -58,6 +58,10 @@
             ]
             ++ (with pkgs.xorg; [
               libX11
+              libXfixes
+              libXau
+              libXdmcp
+              libXcomposite
             ])
           );
           shellHook = ''
