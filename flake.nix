@@ -37,6 +37,7 @@
             corepack_latest
             fish
             zsh
+            libGL
           ];
           LD_LIBRARY_PATH = pkgs.lib.strings.makeLibraryPath (
             with pkgs;
