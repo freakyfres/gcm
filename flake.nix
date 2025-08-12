@@ -54,6 +54,7 @@
               cups
               cairo
               gtk3
+              pango
             ]
           );
           shellHook = ''
