@@ -1,9 +1,9 @@
 import { QuitAppItem } from "./items/QuitAppItem";
 import { ShowHideWindowItem } from "./items/ShowHideWindowItem";
 import { TrayItem } from "./items/TrayItem";
+import trayIcon from "../assets/icon.png?asset";
 
 import { Menu, Tray } from "electron";
-import { join } from "node:path";
 
 
 class TrayMenu {
@@ -39,7 +39,7 @@ class TrayMenu {
 }
 
 export function createSystemTray() {
-    const tray = new Tray(join(process.env.VITE_PUBLIC || process.env.APP_ROOT, "icon.png"));
+    const tray = new Tray(trayIcon);
     const trayMenu = new TrayMenu(tray);
 
     trayMenu.addItem(new ShowHideWindowItem());

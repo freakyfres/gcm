@@ -1,5 +1,6 @@
 import { writeProcessId } from "./dev";
 await writeProcessId();
+import electronViteSvg from "./assets/electron-vite.svg?asset";
 import { createSystemTray } from "./tray/systemTray";
 import native, { ClipboardData, IconData } from "./gcmNative.node";
 import { windowState } from "./WindowState";
@@ -11,7 +12,6 @@ import { writeFile } from "node:fs/promises";
 import { join } from "node:path";
 
 process.env.APP_ROOT = join(__dirname, "..");
-console.log(native);
 
 // 🚧 Use ['ENV_NAME'] avoid vite:define plugin - Vite@2.x
 export const { ELECTRON_RENDERER_URL } = process.env;
@@ -40,10 +40,9 @@ native.registerClipboardWatcherCallback(async (data: ClipboardData) => {
 
 let win: BrowserWindow;
 
-
 function createWindow() {
     win = new BrowserWindow({
-        icon: join(process.env.VITE_PUBLIC!, "electron-vite.svg"),
+        icon: electronViteSvg,
         webPreferences: {
             preload: join(__dirname, "preload.mjs"),
         },
