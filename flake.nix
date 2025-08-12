@@ -52,6 +52,7 @@
               dbus
               at-spi2-atk
               cups
+              cairo
             ]
           );
           shellHook = ''
