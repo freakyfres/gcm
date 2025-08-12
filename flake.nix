@@ -66,6 +66,7 @@
               libXdamage
               libXext
               libXrandr
+              libxcb
             ])
           );
           shellHook = ''
