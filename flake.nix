@@ -56,6 +56,9 @@
               gtk3
               pango
             ]
+            ++ (with pkgs.xorg; [
+              libX11
+            ])
           );
           shellHook = ''
             #shell config here
