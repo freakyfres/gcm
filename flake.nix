@@ -48,6 +48,7 @@
               #electron/chromium
               glib
               nspr
+              nss
             ]
           );
           shellHook = ''
