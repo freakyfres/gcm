@@ -51,6 +51,7 @@
               nss
               dbus
               at-spi2-atk
+              cups
             ]
           );
           shellHook = ''
