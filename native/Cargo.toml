@@ -1,0 +1,23 @@
+[package]
+authors = ["sadan"]
+edition = "2021"
+name    = "gcm-native"
+version = "0.1.0"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[lib]
+crate-type = ["cdylib"]
+
+[dependencies]
+napi        = "3.0.0"
+napi-derive = "3.0.0"
+serde_json = "1.0.142"
+anyhow = "1.0.99"
+x11rb = {version = "0.13.1", features = ["xfixes"]}
+[build-dependencies]
+napi-build = "2"
+
+[profile.release]
+lto   = true
+strip = "symbols"

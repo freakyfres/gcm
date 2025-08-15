@@ -5,7 +5,7 @@ export interface IconData {
 }
 
 export interface AppInfo {
-    pid: number | null;
+    pid?: number;
     /**
      * empty if not available
      */
@@ -15,13 +15,13 @@ export interface AppInfo {
      */
     windowClass: string[];
     windowTitle: string;
-    exePath: string | null;
+    exePath?: string;
 }
 
 export interface ClipboardData {
     changeReason: "new_owner" | "destroy" | "close";
     changeTimestamp: number;
-    appInfo: AppInfo | null;
+    appInfo?: AppInfo;
 }
 
 declare var _: {

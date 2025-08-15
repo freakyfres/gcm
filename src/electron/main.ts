@@ -31,6 +31,10 @@ function iconDataToPng(image: IconData): Buffer {
 }
 // eslint-disable-next-line @typescript-eslint/require-await
 native.registerClipboardWatcherCallback(async (data: ClipboardData) => {
+    console.log(inspect(data, {
+        colors: true,
+        depth: null,
+    }));
     if (data.appInfo) {
         try {
             const buf = iconDataToPng(data.appInfo.iconData);
@@ -39,10 +43,6 @@ native.registerClipboardWatcherCallback(async (data: ClipboardData) => {
         } catch (e) {
             console.warn("failed to write icon data", e);
         }
-        console.log(inspect(data, {
-            colors: true,
-            depth: null,
-        }));
     }
     console.log("Clipboard changed!");
 });

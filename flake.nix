@@ -61,6 +61,8 @@
               expat
               libxkbcommon
               alsa-lib
+              # rust-analyzer
+              libz
             ]
             ++ (with pkgs.xorg; [
               libX11

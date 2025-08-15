@@ -7,8 +7,7 @@
     "dev": "pnpm build-native && electron-vite dev",
     "start": "electron-vite preview",
     "prebuild": "electron-vite build",
-    "configure": "cmake-js configure -d native -D",
-    "build-native": "pnpm configure && cmake-js compile -d native -D && node ./scripts/copyNativeBuild.mjs"
+    "build-native": "cargo build --manifest-path native/Cargo.toml && node ./scripts/copyNativeBuild.mjs"
   },
   "dependencies": {
     "canvas": "^3.1.2",
