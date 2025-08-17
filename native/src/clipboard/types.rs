@@ -22,7 +22,7 @@ impl From<SelectionEvent> for ChangeReason {
 }
 
 #[napi(object)]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct IconData {
     pub width: u32,
     pub height: u32,
@@ -30,9 +30,9 @@ pub struct IconData {
 }
 
 #[napi(object)]
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct AppInfo {
-    pub pid: Option<u32>,
+    pub pid: Option<i32>,
     pub icon_data: IconData,
     pub window_class: (String, String),
     pub window_title: String,
@@ -45,6 +45,15 @@ pub struct ClipboardData {
     pub change_reason: ChangeReason,
     pub change_timestamp: u32,
     pub app_info: Option<AppInfo>,
+}
+impl Default for ClipboardData {
+    fn default() -> Self {
+        Self {
+            change_reason: ChangeReason::NewOwner,
+            change_timestamp: 0,
+            app_info: Some(AppInfo::default()),
+        }
+    }
 }
 
 pub type WatcherCallback = ThreadsafeFunction<ClipboardData, UnknownReturnValue>;

@@ -1,11 +1,11 @@
-use std::{fs, rc::Rc};
+use std::fs;
 
 use anyhow::Result;
 use x11rb::{
-    connection::{Connection, RequestConnection},
+    connection::Connection,
     protocol::{
-        xfixes::{SelectSelectionInputRequest, SelectionEventMask, SelectionNotifyEvent},
-        xproto::{Atom, AtomEnum, ConnectionExt, Window},
+        xfixes::{ConnectionExt, SelectionEventMask, SelectionNotifyEvent},
+        xproto::{Atom, AtomEnum, ConnectionExt as _, Window},
         Event,
     },
     rust_connection::RustConnection,
@@ -34,6 +34,8 @@ struct Atoms {
     WM_CLASS: Atom,
     UTF8_STRING: Atom,
     _NET_WM_NAME: Atom,
+    _NET_WM_ICON: Atom,
+    _NET_WM_PID: Atom,
 }
 
 impl Atoms {
@@ -50,6 +52,8 @@ impl Atoms {
             UTF8_STRING: i("UTF8_STRING")?,
             _NET_WM_NAME: i("_NET_WM_NAME")?,
             _NET_ACTIVE_WINDOW: i("_NET_ACTIVE_WINDOW")?,
+            _NET_WM_ICON: i("_NET_WM_ICON")?,
+            _NET_WM_PID: i("_NET_WM_PID")?,
             WM_CLASS: i("WM_CLASS")?,
             XA_WINDOW: x(AtomEnum::WINDOW),
             XA_CARDINAL: x(AtomEnum::CARDINAL),
@@ -93,8 +97,22 @@ impl<'a> WindowContext<'a> {
         self.screen = screen;
     }
 
-    fn get_window_pid(&self) -> Result<Option<u32>> {
-        todo!()
+    fn get_window_pid(&self) -> Result<Option<i32>> {
+        let res: Option<Vec<u32>> = self
+            .conn
+            .get_property(
+                false,
+                self.window,
+                self.atoms._NET_WM_PID,
+                self.atoms.XA_CARDINAL,
+                0,
+                1,
+            )?
+            .reply()?
+            .value32()
+            .map(|i| i.collect());
+        dbg!(res);
+        Ok(None)
     }
     fn get_window_name(&self) -> Result<String> {
         Ok(self
@@ -112,7 +130,19 @@ impl<'a> WindowContext<'a> {
             .try_into()?)
     }
     fn get_window_icon(&self) -> Result<IconData> {
-        todo!()
+        let res = self
+            .conn
+            .get_property(
+                false,
+                self.window,
+                self.atoms._NET_WM_ICON,
+                self.atoms.XA_CARDINAL,
+                0,
+                1,
+            )?
+            .reply()?;
+        dbg!(res);
+        Ok(IconData::default())
     }
     fn get_window_class(&self) -> Result<(String, String)> {
         let binding = self
@@ -139,11 +169,32 @@ impl<'a> WindowContext<'a> {
             .try_into()?;
         Ok((first, second))
     }
-    fn get_window_exe_path(&self, pid: u32) -> Result<Option<String>> {
-        let exe_path = fs::read_link(format!("/proc/{pid}/exe"))?;
+    fn get_window_exe_path(&self, pid: i32) -> Result<Option<String>> {
+        let path = format!("/proc/{pid}/exe");
+        if !fs::exists(&path)? {
+            return Ok(None);
+        }
+        Ok(Some(
+            fs::read_link(&path)?
+                .into_os_string()
+                .into_string()
+                .or_else(|orig_str| {
+                    Err(anyhow::anyhow!(
+                        "Failed to convert path to string: {:?}",
+                        orig_str
+                    ))
+                })?,
+        ))
     }
     fn get_window_info(&self) -> Result<AppInfo> {
-        todo!()
+        let pid = self.get_window_pid()?;
+        Ok(AppInfo {
+            pid,
+            exe_path: pid.map_or(Ok(None), |pid| self.get_window_exe_path(pid))?,
+            icon_data: self.get_window_icon()?,
+            window_title: self.get_window_name()?,
+            window_class: self.get_window_class()?,
+        })
     }
 }
 
@@ -151,24 +202,32 @@ impl Watcher {
     pub fn try_new() -> Result<Self> {
         let (conn, screen) = x11rb::connect(None)?;
         let atoms = Atoms::try_new(&conn)?;
-        conn.send_trait_request_without_reply(SelectSelectionInputRequest {
-            window: WindowContext::default_root_window(&conn, Some(screen)),
-            selection: atoms.CLIPBOARD,
-            event_mask: SelectionEventMask::SET_SELECTION_OWNER,
-        })?;
+        let xfixes = conn
+            .query_extension("XFIXES".as_bytes())?
+            .reply()?;
+        if !xfixes.present {
+            return Err(anyhow::anyhow!("XFIXES extension is not available"));
+        }
+
+        conn.xfixes_select_selection_input(
+            WindowContext::default_root_window(&conn, Some(screen)),
+            atoms.CLIPBOARD,
+            SelectionEventMask::SET_SELECTION_OWNER,
+        )?
+        .check()?;
         Ok(Self {
             conn,
             atoms,
             last_change_data: None,
         })
     }
-    fn get_app_info(&mut self, event: SelectionNotifyEvent) -> Result<Option<AppInfo>> {
+    fn get_app_info(&mut self, _event: SelectionNotifyEvent) -> Result<Option<AppInfo>> {
         let active_window: Window = match WindowContext::get_active_window(&self.conn)? {
             Some(w) => w,
             None => return Ok(None),
         };
-        let w_ctx = WindowContext::try_new(&self.conn, active_window)?;
-        Ok(None)
+        let window_info = WindowContext::try_new(&self.conn, active_window)?.get_window_info()?;
+        Ok(Some(window_info))
     }
     fn write_last_change_data(&mut self, event: SelectionNotifyEvent) -> Result<()> {
         self.last_change_data = Some(ClipboardData {
@@ -184,16 +243,20 @@ impl ClipboardWatcher for Watcher {
     fn sleep_until_next_change(&mut self) -> Result<()> {
         let ev: SelectionNotifyEvent;
         loop {
-            if let Event::XfixesSelectionNotify(raw_ev) = self.conn.wait_for_event()? {
-                ev = raw_ev;
-                break;
+            match self.conn.wait_for_event()? {
+                Event::XfixesSelectionNotify(raw_ev) => {
+                    ev = raw_ev;
+                    break;
+                }
+                _ => (),
             }
         }
+        println!("got event: {:?}", ev);
         self.write_last_change_data(ev)?;
         Ok(())
     }
 
-    fn get_last_change_data(&self) -> crate::clipboard::types::ClipboardData {
-        todo!()
+    fn get_last_change_data(&self) -> Option<ClipboardData> {
+        self.last_change_data.clone()
     }
 }

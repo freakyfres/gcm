@@ -1,4 +1,4 @@
-use crate::clipboard::watcher::ClipboardWatcher;
+use crate::clipboard::{types::ClipboardData, watcher::ClipboardWatcher};
 
 pub struct Watcher {}
 
@@ -13,7 +13,7 @@ impl ClipboardWatcher for Watcher {
         todo!()
     }
 
-    fn get_last_change_data(&self) -> crate::clipboard::types::ClipboardData {
+    fn get_last_change_data(&self) -> Option<ClipboardData> {
         todo!()
     }
 }

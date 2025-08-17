@@ -6,7 +6,7 @@ mod x11;
 mod wayland;
 pub trait ClipboardWatcher {
     fn sleep_until_next_change(&mut self) -> Result<(), anyhow::Error>;
-    fn get_last_change_data(&self) -> types::ClipboardData;
+    fn get_last_change_data(&self) -> Option<types::ClipboardData>;
 }
 
 pub fn get_clipboard_watcher() -> Result<Box<dyn ClipboardWatcher>, anyhow::Error> {
